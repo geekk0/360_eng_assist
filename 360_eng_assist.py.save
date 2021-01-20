@@ -1,0 +1,61 @@
+import telebot
+import config
+import os
+from DB import Files, Schemes
+
+
+bot = telebot.TeleBot(config.TOKEN)
+
+
+@bot.message_handler(commands=['start'])
+def start_message(message):
+    bot.send_message(message.chat.id, 'Привет! Выбери нужный раздел: /cameras /schemes  ')
+
+@bot.message_handler(commands=['cameras'])
+def list (message):
+    for key in Files:
+        bot.send_message(message.chat.id, key)
+
+@bot.message_handler(commands=['schemes'])
+def list (message):
+    for key in Schemes:
+        bot.send_message(message.chat.id, key)
+
+@bot.messag_handler(commands=['ZOOM'])
+def list (message):
+    for key in ZOOM:
+        bot send_message(message.chat.id, key)
+
+@bot.message_handler (content_types=["text"])
+def arrangement(message):
+     file_dest = '/root/Telegram/360_eng_assist/камеры/'
+     coin_num = 0
+     for key in Files:
+         if message.text.lower() == key:
+             coin_num = 1
+             img = open(file_dest + Files.get(key), 'rb')
+             bot.send_photo(message.chat.id, img)
+             break
+     file_dest = '/root/Telegram/360_eng_assist/схемы/'
+     for key in Schemes:
+         if message.text.lower() == key:
+             coin_num = 2
+             doc = open(file_dest + Schemes.get(key), 'rb')
+             bot.send_document(message.chat.id, doc)
+             break
+     file_dest = '/root/Telegram/360_eng_assist/ZOOM'
+     for key in ZOOM:
+          if message.text.lower() == key:
+             coin_num = 3
+             img = open(file
+     if coin_num == 0:
+         bot.send_message(message.chat.id, 'нет такой команды')
+
+
+
+if __name__ == '__main__':
+   try: 
+     bot.infinity_polling()
+   except: 
+     os.command('python /root/Telegram/360_eng_assist/360_eng_assist.py')
+ 
