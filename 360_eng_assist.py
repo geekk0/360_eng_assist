@@ -7,18 +7,20 @@ from DB import Files, Schemes, ZOOM
 
 bot = telebot.TeleBot(TOKEN)
 
+
 @bot.message_handler(commands=['start'])
 def start_message(message):
     bot.send_message(message.chat.id, 'Привет! Выбери нужный раздел: /cameras /schemes /ZOOM /otpuska /ip /asb3bank')
 
+
 @bot.message_handler(commands=['otpuska'])
 def vacs (message):
-    vac = open('/root/Telegram/360_eng_assist/График отпусков 2020.ods', 'rb')
+    vac = open('График отпусков 2020.ods', 'rb')
     bot.send_document(message.chat.id, vac)
 
 @bot.message_handler(commands=['ip'])
 def ip_adr (message):
-    ip_adr = open('/root/Telegram/360_eng_assist/IP адреса.ods', 'rb')
+    ip_adr = open('IP адреса.ods', 'rb')
     bot.send_document(message.chat.id, ip_adr)
 
 @bot.message_handler(commands=['cameras'])
@@ -40,7 +42,7 @@ def list(message):
 
 @bot.message_handler(commands=['asb3bank'])
 def asb3bank (message):
-    asb3bank = open('/root/Telegram/360_eng_assist/asb3bank.png', 'rb')
+    asb3bank = open('asb3bank.png', 'rb')
     bot.send_document(message.chat.id, asb3bank)
 
 @bot.message_handler(content_types=["text"])

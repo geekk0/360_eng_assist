@@ -1,7 +1,7 @@
-dest_cameras = '/root/Telegram/360_eng_assist/камеры/'
+dest_cameras = 'камеры/'
 
-dest_schemes = '/root/Telegram/360_eng_assist/схемы/'
+dest_schemes = 'схемы/'
 
-dest_ZOOM = '/root/Telegram/360_eng_assist/ZOOM/'
+dest_ZOOM = 'ZOOM/'
 
-dest_script = 'python /root/Telegram/360_eng_assist.py'
+dest_script = '360_eng_assist.py'
