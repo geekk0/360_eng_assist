@@ -1,7 +1,7 @@
 import telebot
 import os
 import time
-from token import TOKEN
+from ntoken import TOKEN
 from config import dest_cameras, dest_schemes, dest_ZOOM, dest_script
 from DB import Files, Schemes, ZOOM
 
