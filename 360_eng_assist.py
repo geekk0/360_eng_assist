@@ -9,6 +9,7 @@ from telebot import types
 bot = telebot.TeleBot(TOKEN)
 
 commands_for_buttons = {'otpuska': 'Отпуска', 'ip_adr': 'ip', 'asb3bank': 'asb3bank', 'schemes_list': 'Схемы', 'cameras_list': 'Камеры', 'zoom_list': 'Zoom'}
+commands_string = ''.join('{}{}'.format(key, val) for key, val in commands_for_buttons.items())
 
 
 def create_keyboard():
@@ -17,6 +18,11 @@ def create_keyboard():
     for key in commands_for_buttons.keys()]
     keyboard.add(*buttons)
     return keyboard
+
+
+def cameras_send(cam_file, messageid):
+    img = open(dest_cameras + Files.get(cam_file), 'rb')
+    bot.send_photo(messageid, img)
 
 
 @bot.message_handler(commands=['start'])
@@ -41,8 +47,11 @@ def ip_adr(messageid):
 
 @bot.message_handler(commands=['cameras'])
 def cameras_list(messageid):
-    for key in Files:
-        bot.send_message(messageid, key)
+    keyboard = types.InlineKeyboardMarkup()
+    buttons = [types.InlineKeyboardButton(text=key, callback_data=key)
+    for key in Files.keys()]
+    keyboard.add(*buttons)
+    bot.send_message(messageid, 'Расстановка камер по программам', reply_markup=keyboard)
 
 
 @bot.message_handler(commands=['schemes'])
@@ -64,12 +73,22 @@ def asb3bank(messageid):
     bot.send_document(messageid, asb3bank, reply_markup=keyboard)
 
 
-@bot.callback_query_handler(func=lambda x: True)
-def callback_handler(callback_query):
+@bot.callback_query_handler(func=lambda call: call.data in commands_string)
+def callback_clearfunc(callback_query):
     messageid = callback_query.message.chat.id
     text = callback_query.data
+    print(text)
     func_name = text+'('+str(messageid)+')'
+    print(func_name)
     eval(func_name)
+
+
+@bot.callback_query_handler(func=lambda call: call.data in Files)
+def callback_argfunc(callback_query):
+    messageid = callback_query.message.chat.id
+    text = str(callback_query.data)
+    print('testcallback')
+    cameras_send(str(text), messageid)
 
 
 @bot.message_handler(content_types=["text"])
@@ -96,5 +115,5 @@ if __name__ == '__main__':
     try:
         bot.infinity_polling()
     except:
-        time.sleep(10)
+        time.sleep(5)
         os.system('python 360_eng_assist.py &')
