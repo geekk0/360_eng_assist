@@ -65,17 +65,27 @@ def start_message(message):
 
 
 @bot.message_handler(commands=['otpuska'])
-def otpuska(chatid):
+def otpuska(chatid, messageid):
     vac = open('График отпусков 2020.ods', 'rb')
     keyboard = create_keyboard()
     bot.send_document(chatid, vac, reply_markup=keyboard)
+    bot.delete_message(chatid, messageid)
 
 
 @bot.message_handler(commands=['ip'])
-def ip_adr(chatid):
-    ip_adr = open('IP адреса.ods', 'rb')
-    create_keyboard()
-    bot.send_document(chatid, ip_adr, reply_markup=keyboard)
+def ip_adr(chatid, messageid):
+    ip = open('IP адреса.ods', 'rb')
+    keyboard = create_keyboard()
+    bot.send_document(chatid, ip, reply_markup=keyboard)
+    bot.delete_message(chatid, messageid)
+
+
+@bot.message_handler(commands=['asb3bank'])
+def asb3bank(chatid, messageid):
+    a3b = open('ASB3Bank.odt', 'rb')
+    keyboard = create_keyboard()
+    bot.send_document(chatid, a3b, reply_markup=keyboard)
+    bot.delete_message(chatid, messageid)
 
 
 @bot.message_handler(commands=['cameras'])
