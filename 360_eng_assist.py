@@ -124,11 +124,7 @@ def callback_clearfunc(callback_query):
     chatid = callback_query.message.chat.id
     messageid = callback_query.message.message_id
     text = callback_query.data
-    print('simple_callback')
-    print(messageid)
-    print(text)
     func_name = text+'('+str(chatid)+','+str(messageid)+')'
-    print(func_name)
     eval(func_name)
 
 
@@ -137,8 +133,6 @@ def callback_cameras(callback_query):
     chatid = callback_query.message.chat.id
     messageid = callback_query.message.message_id
     text = str(callback_query.data)
-    print('cameras_callback')
-    print(messageid)
     cameras_send(str(text), chatid, messageid)
 
 
@@ -147,8 +141,6 @@ def callback_schemes(callback_query):
     chatid = callback_query.message.chat.id
     messageid = callback_query.message.message_id
     text = str(callback_query.data)
-    print('schemes_callback')
-    print(messageid)
     schemes_send(str(text), chatid, messageid)
 
 
@@ -157,8 +149,6 @@ def callback_zoom(callback_query):
     chatid = callback_query.message.chat.id
     messageid = callback_query.message.message_id
     text = str(callback_query.data)
-    print('zoom_callback')
-    print(messageid)
     zoom_send(str(text), chatid, messageid)
 
 
