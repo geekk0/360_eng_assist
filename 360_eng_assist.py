@@ -43,7 +43,7 @@ def schemes_send(scheme_file, chatid, messageid):
     keyboard.add(*buttons)
     keyboard.add(back_button)
     bot.delete_message(chatid, messageid)
-    bot.send_message(chatid, text='Выберите схему:', reply_markup=keyboard)
+    bot.send_message(chatid, text='Выбери схему:', reply_markup=keyboard)
 
 
 def zoom_send(zoom_file, chatid, messageid):
@@ -56,12 +56,12 @@ def zoom_send(zoom_file, chatid, messageid):
     keyboard.add(*buttons)
     keyboard.add(back_button)
     bot.delete_message(chatid, messageid)
-    bot.send_message(chatid, text='Выберите тип трансляции:', reply_markup=keyboard)
+    bot.send_message(chatid, text='Выбери тип трансляции:', reply_markup=keyboard)
 
 @bot.message_handler(commands=['start'])
 def start_message(message):
     keyboard = create_keyboard()
-    bot.send_message(message.chat.id, 'Привет! Выбери нужный раздел: /cameras /schemes /ZOOM /otpuska /ip /asb3bank', reply_markup=keyboard)
+    bot.send_message(message.chat.id, 'Привет! Жмякай нужный пункт меню', reply_markup=keyboard)
 
 
 @bot.message_handler(commands=['otpuska'])
