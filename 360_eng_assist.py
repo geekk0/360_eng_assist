@@ -32,6 +32,32 @@ def cameras_send(cam_file, chatid, messageid):
     bot.delete_message(chatid, messageid)
     bot.send_message(chatid, text='Выберите программу:', reply_markup=keyboard)
 
+
+def schemes_send(scheme_file, chatid, messageid):
+    doc = open(dest_schemes + Schemes.get(scheme_file), 'rb')
+    bot.send_document(chatid, doc)
+    keyboard = types.InlineKeyboardMarkup()
+    back_button = types.InlineKeyboardButton(text='Назад', callback_data='back')
+    buttons = [types.InlineKeyboardButton(text=key, callback_data=key)
+               for key in Schemes.keys()]
+    keyboard.add(*buttons)
+    keyboard.add(back_button)
+    bot.delete_message(chatid, messageid)
+    bot.send_message(chatid, text='Выберите схему:', reply_markup=keyboard)
+
+
+def zoom_send(zoom_file, chatid, messageid):
+    img = open(dest_ZOOM + ZOOM.get(zoom_file), 'rb')
+    bot.send_photo(chatid, img)
+    keyboard = types.InlineKeyboardMarkup()
+    back_button = types.InlineKeyboardButton(text='Назад', callback_data='back')
+    buttons = [types.InlineKeyboardButton(text=key, callback_data=key)
+               for key in ZOOM.keys()]
+    keyboard.add(*buttons)
+    keyboard.add(back_button)
+    bot.delete_message(chatid, messageid)
+    bot.send_message(chatid, text='Выберите тип трансляции:', reply_markup=keyboard)
+
 @bot.message_handler(commands=['start'])
 def start_message(message):
     keyboard = create_keyboard()
@@ -56,30 +82,30 @@ def ip_adr(chatid):
 def cameras_list(chatid, messageid):
     keyboard = types.InlineKeyboardMarkup()
     back_button = types.InlineKeyboardButton(text='Назад', callback_data='back')
-    buttons = [types.InlineKeyboardButton(text=key, callback_data=key)
-    for key in Files.keys()]
+    buttons = [types.InlineKeyboardButton(text=key, callback_data=key) for key in Files.keys()]
     keyboard.add(*buttons)
     keyboard.add(back_button)
     bot.edit_message_text('Выберите программу:', chatid, messageid, reply_markup=keyboard)
 
 
 @bot.message_handler(commands=['schemes'])
-def schemes_list(chatid):
-    for key in Schemes:
-        bot.send_message(chatid, key)
+def schemes_list(chatid, messageid):
+    keyboard = types.InlineKeyboardMarkup()
+    back_button = types.InlineKeyboardButton(text='Назад', callback_data='back')
+    buttons = [types.InlineKeyboardButton(text=key, callback_data=key) for key in Schemes.keys()]
+    keyboard.add(*buttons)
+    keyboard.add(back_button)
+    bot.edit_message_text('Выберите схему:', chatid, messageid, reply_markup=keyboard)
 
 
-@bot.message_handler(commands=['ZOOM'])
-def zoom_list(chatid):
-    for key in ZOOM:
-        bot.send_message(chatid, key)
-
-
-@bot.message_handler(commands=['asb3bank'])
-def asb3bank(chatid):
-    asb3bank = open('asb3bank.png', 'rb')
-    keyboard = create_keyboard()
-    bot.send_document(chatid, asb3bank, reply_markup=keyboard)
+@bot.message_handler(commands=['schemes'])
+def zoom_list(chatid, messageid):
+    keyboard = types.InlineKeyboardMarkup()
+    back_button = types.InlineKeyboardButton(text='Назад', callback_data='back')
+    buttons = [types.InlineKeyboardButton(text=key, callback_data=key) for key in ZOOM.keys()]
+    keyboard.add(*buttons)
+    keyboard.add(back_button)
+    bot.edit_message_text('Выберите тип трансляции:', chatid, messageid, reply_markup=keyboard)
 
 
 @bot.callback_query_handler(func=lambda call: call.data in commands_string)
@@ -87,6 +113,7 @@ def callback_clearfunc(callback_query):
     chatid = callback_query.message.chat.id
     messageid = callback_query.message.message_id
     text = callback_query.data
+    print('simple_callback')
     print(messageid)
     print(text)
     func_name = text+'('+str(chatid)+','+str(messageid)+')'
@@ -95,13 +122,33 @@ def callback_clearfunc(callback_query):
 
 
 @bot.callback_query_handler(func=lambda call: call.data in Files)
-def callback_argfunc(callback_query):
+def callback_cameras(callback_query):
     chatid = callback_query.message.chat.id
     messageid = callback_query.message.message_id
     text = str(callback_query.data)
-    print('testcallback')
+    print('cameras_callback')
     print(messageid)
     cameras_send(str(text), chatid, messageid)
+
+
+@bot.callback_query_handler(func=lambda call: call.data in Schemes)
+def callback_schemes(callback_query):
+    chatid = callback_query.message.chat.id
+    messageid = callback_query.message.message_id
+    text = str(callback_query.data)
+    print('schemes_callback')
+    print(messageid)
+    schemes_send(str(text), chatid, messageid)
+
+
+@bot.callback_query_handler(func=lambda call: call.data in ZOOM)
+def callback_zoom(callback_query):
+    chatid = callback_query.message.chat.id
+    messageid = callback_query.message.message_id
+    text = str(callback_query.data)
+    print('zoom_callback')
+    print(messageid)
+    zoom_send(str(text), chatid, messageid)
 
 
 @bot.callback_query_handler(func=lambda call: 'back')
@@ -110,6 +157,7 @@ def go_to_main(callback_query):
     chatid = callback_query.message.chat.id
     messageid = callback_query.message.message_id
     bot.edit_message_text('Выберите раздел:', chatid, messageid, reply_markup=keyboard)
+
 
 @bot.message_handler(content_types=["text"])
 def arrangement(message):
