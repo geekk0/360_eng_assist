@@ -20,10 +20,17 @@ def create_keyboard():
     return keyboard
 
 
-def cameras_send(cam_file, messageid):
+def cameras_send(cam_file, chatid, messageid):
     img = open(dest_cameras + Files.get(cam_file), 'rb')
-    bot.send_photo(messageid, img)
-
+    bot.send_photo(chatid, img)
+    keyboard = types.InlineKeyboardMarkup()
+    back_button = types.InlineKeyboardButton(text='Назад', callback_data='back')
+    buttons = [types.InlineKeyboardButton(text=key, callback_data=key)
+    for key in Files.keys()]
+    keyboard.add(*buttons)
+    keyboard.add(back_button)
+    bot.delete_message(chatid, messageid)
+    bot.send_message(chatid, text='Выберите программу:', reply_markup=keyboard)
 
 @bot.message_handler(commands=['start'])
 def start_message(message):
@@ -32,64 +39,77 @@ def start_message(message):
 
 
 @bot.message_handler(commands=['otpuska'])
-def otpuska(messageid):
+def otpuska(chatid):
     vac = open('График отпусков 2020.ods', 'rb')
     keyboard = create_keyboard()
-    bot.send_document(messageid, vac, reply_markup=keyboard)
+    bot.send_document(chatid, vac, reply_markup=keyboard)
 
 
 @bot.message_handler(commands=['ip'])
-def ip_adr(messageid):
+def ip_adr(chatid):
     ip_adr = open('IP адреса.ods', 'rb')
-    keyboard = create_keyboard()
-    bot.send_document(messageid, ip_adr, reply_markup=keyboard)
+    create_keyboard()
+    bot.send_document(chatid, ip_adr, reply_markup=keyboard)
 
 
 @bot.message_handler(commands=['cameras'])
-def cameras_list(messageid):
+def cameras_list(chatid, messageid):
     keyboard = types.InlineKeyboardMarkup()
+    back_button = types.InlineKeyboardButton(text='Назад', callback_data='back')
     buttons = [types.InlineKeyboardButton(text=key, callback_data=key)
     for key in Files.keys()]
     keyboard.add(*buttons)
-    bot.send_message(messageid, 'Расстановка камер по программам', reply_markup=keyboard)
+    keyboard.add(back_button)
+    bot.edit_message_text('Выберите программу:', chatid, messageid, reply_markup=keyboard)
 
 
 @bot.message_handler(commands=['schemes'])
-def schemes_list(messageid):
+def schemes_list(chatid):
     for key in Schemes:
-        bot.send_message(messageid, key)
+        bot.send_message(chatid, key)
 
 
 @bot.message_handler(commands=['ZOOM'])
-def zoom_list(messageid):
+def zoom_list(chatid):
     for key in ZOOM:
-        bot.send_message(messageid, key)
+        bot.send_message(chatid, key)
 
 
 @bot.message_handler(commands=['asb3bank'])
-def asb3bank(messageid):
+def asb3bank(chatid):
     asb3bank = open('asb3bank.png', 'rb')
     keyboard = create_keyboard()
-    bot.send_document(messageid, asb3bank, reply_markup=keyboard)
+    bot.send_document(chatid, asb3bank, reply_markup=keyboard)
 
 
 @bot.callback_query_handler(func=lambda call: call.data in commands_string)
 def callback_clearfunc(callback_query):
-    messageid = callback_query.message.chat.id
+    chatid = callback_query.message.chat.id
+    messageid = callback_query.message.message_id
     text = callback_query.data
+    print(messageid)
     print(text)
-    func_name = text+'('+str(messageid)+')'
+    func_name = text+'('+str(chatid)+','+str(messageid)+')'
     print(func_name)
     eval(func_name)
 
 
 @bot.callback_query_handler(func=lambda call: call.data in Files)
 def callback_argfunc(callback_query):
-    messageid = callback_query.message.chat.id
+    chatid = callback_query.message.chat.id
+    messageid = callback_query.message.message_id
     text = str(callback_query.data)
     print('testcallback')
-    cameras_send(str(text), messageid)
+    print(messageid)
+    cameras_send(str(text), chatid, messageid)
 
+
+@bot.callback_query_handler(func=lambda call: 'back')
+def go_to_main(callback_query):
+    keyboard = create_keyboard()
+    chatid = callback_query.message.chat.id
+    messageid = callback_query.message.message_id
+    bot.edit_message_text('Выберите раздел:', chatid, messageid, reply_markup=keyboard)
 
 @bot.message_handler(content_types=["text"])
 def arrangement(message):
