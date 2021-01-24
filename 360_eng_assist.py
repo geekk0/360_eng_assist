@@ -72,6 +72,7 @@ def otpuska(chatid, messageid):
     bot.delete_message(chatid, messageid)
 
 
+
 @bot.message_handler(commands=['ip'])
 def ip_adr(chatid, messageid):
     ip = open('IP адреса.ods', 'rb')
@@ -95,7 +96,7 @@ def cameras_list(chatid, messageid):
     buttons = [types.InlineKeyboardButton(text=key, callback_data=key) for key in Files.keys()]
     keyboard.add(*buttons)
     keyboard.add(back_button)
-    bot.edit_message_text('Выберите программу:', chatid, messageid, reply_markup=keyboard)
+    bot.edit_message_reply_markup(chatid, messageid, reply_markup=keyboard)
 
 
 @bot.message_handler(commands=['schemes'])
@@ -105,7 +106,7 @@ def schemes_list(chatid, messageid):
     buttons = [types.InlineKeyboardButton(text=key, callback_data=key) for key in Schemes.keys()]
     keyboard.add(*buttons)
     keyboard.add(back_button)
-    bot.edit_message_text('Выберите схему:', chatid, messageid, reply_markup=keyboard)
+    bot.edit_message_reply_markup(chatid, messageid, reply_markup=keyboard)
 
 
 @bot.message_handler(commands=['schemes'])
@@ -115,7 +116,7 @@ def zoom_list(chatid, messageid):
     buttons = [types.InlineKeyboardButton(text=key, callback_data=key) for key in ZOOM.keys()]
     keyboard.add(*buttons)
     keyboard.add(back_button)
-    bot.edit_message_text('Выберите тип трансляции:', chatid, messageid, reply_markup=keyboard)
+    bot.edit_message_reply_markup(chatid, messageid, reply_markup=keyboard)
 
 
 @bot.callback_query_handler(func=lambda call: call.data in commands_string)
