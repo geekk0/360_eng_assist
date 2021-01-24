@@ -167,7 +167,7 @@ def go_to_main(callback_query):
     keyboard = create_keyboard()
     chatid = callback_query.message.chat.id
     messageid = callback_query.message.message_id
-    bot.edit_message_text('Выберите раздел:', chatid, messageid, reply_markup=keyboard)
+    bot.edit_message_reply_markup(chatid, messageid, reply_markup=keyboard)
 
 
 @bot.message_handler(content_types=["text"])
