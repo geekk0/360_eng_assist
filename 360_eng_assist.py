@@ -161,25 +161,6 @@ def go_to_main(callback_query):
     bot.edit_message_reply_markup(chatid, messageid, reply_markup=keyboard)
 
 
-@bot.message_handler(content_types=["text"])
-def arrangement(message):
-    for key in Files:
-        if message.text.lower() == key:
-            img = open(dest_cameras + Files.get(key), 'rb')
-            bot.send_photo(message.chat.id, img)
-            break
-    for key in Schemes:
-        if message.text.lower() == key:
-            doc = open(dest_schemes + Schemes.get(key), 'rb')
-            bot.send_document(message.chat.id, doc)
-            break
-    for key in ZOOM:
-        if message.text.lower() == key:
-            img = open(dest_ZOOM + ZOOM.get(key), 'rb')
-            bot.send_photo(message.chat.id, img)
-            break
-
-
 if __name__ == '__main__':
     try:
         bot.infinity_polling()
