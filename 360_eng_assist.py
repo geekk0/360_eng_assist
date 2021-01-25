@@ -8,14 +8,15 @@ from telebot import types
 
 bot = telebot.TeleBot(TOKEN)
 
-commands_for_buttons = {'otpuska': 'Отпуска', 'ip_adr': 'ip', 'asb3bank': 'asb3bank', 'schemes_list': 'Схемы', 'cameras_list': 'Камеры', 'zoom_list': 'Zoom'}
+commands_for_buttons = {'otpuska': 'Отпуска', 'ip_adr': 'ip', 'asb3bank': 'asb3bank', 'schemes_list': 'Схемы',
+                        'cameras_list': 'Камеры', 'zoom_list': 'Zoom'}
 commands_string = ''.join('{}{}'.format(key, val) for key, val in commands_for_buttons.items())
 
 
 def create_keyboard():
     keyboard = types.InlineKeyboardMarkup(row_width=4)
     buttons = [types.InlineKeyboardButton(text=commands_for_buttons[key], callback_data=key)
-    for key in commands_for_buttons.keys()]
+               for key in commands_for_buttons.keys()]
     keyboard.add(*buttons)
     return keyboard
 
@@ -26,7 +27,7 @@ def cameras_send(cam_file, chatid, messageid):
     keyboard = types.InlineKeyboardMarkup()
     back_button = types.InlineKeyboardButton(text='Назад', callback_data='back')
     buttons = [types.InlineKeyboardButton(text=key, callback_data=key)
-    for key in Files.keys()]
+               for key in Files.keys()]
     keyboard.add(*buttons)
     keyboard.add(back_button)
     bot.delete_message(chatid, messageid)
@@ -58,10 +59,11 @@ def zoom_send(zoom_file, chatid, messageid):
     bot.delete_message(chatid, messageid)
     bot.send_message(chatid, text='Выбери тип трансляции:', reply_markup=keyboard)
 
+
 @bot.message_handler(commands=['start'])
 def start_message(message):
     keyboard = create_keyboard()
-    bot.send_message(message.chat.id, 'Привет! Жмякай нужный пункт меню', reply_markup=keyboard)
+    bot.send_message(message.chat.id, 'Привет! Данные ... надо бы обновить', reply_markup=keyboard)
 
 
 @bot.message_handler(commands=['otpuska'])
@@ -70,7 +72,6 @@ def otpuska(chatid, messageid):
     keyboard = create_keyboard()
     bot.send_document(chatid, vac, reply_markup=keyboard)
     bot.delete_message(chatid, messageid)
-
 
 
 @bot.message_handler(commands=['ip'])
@@ -124,7 +125,7 @@ def callback_clearfunc(callback_query):
     chatid = callback_query.message.chat.id
     messageid = callback_query.message.message_id
     text = callback_query.data
-    func_name = text+'('+str(chatid)+','+str(messageid)+')'
+    func_name = text + '(' + str(chatid) + ',' + str(messageid) + ')'
     eval(func_name)
 
 
@@ -162,7 +163,6 @@ def go_to_main(callback_query):
 
 @bot.message_handler(content_types=["text"])
 def arrangement(message):
-
     for key in Files:
         if message.text.lower() == key:
             img = open(dest_cameras + Files.get(key), 'rb')
