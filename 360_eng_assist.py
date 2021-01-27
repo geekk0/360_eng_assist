@@ -163,7 +163,7 @@ def go_to_main(callback_query):
 
 if __name__ == '__main__':
     try:
-        bot.infinity_polling()
+        bot.infinity_polling(True)
     except:
         time.sleep(5)
         os.system('python 360_eng_assist.py &')
