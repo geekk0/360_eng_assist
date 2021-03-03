@@ -17,7 +17,13 @@ def create_keyboard():
     keyboard = types.InlineKeyboardMarkup(row_width=4)
     buttons = [types.InlineKeyboardButton(text=commands_for_buttons[key], callback_data=key)
                for key in commands_for_buttons.keys()]
+
+    add_button = types.InlineKeyboardButton(text='Добавить', callback_data='add, main')
+    delete_button = types.InlineKeyboardButton(text='Удалить', callback_data='delete, main')
+
+
     keyboard.add(*buttons)
+    keyboard.add(add_button, delete_button)
     return keyboard
 
 
@@ -25,10 +31,16 @@ def cameras_send(cam_file, chatid, messageid):
     img = open(dest_cameras + Files.get(cam_file), 'rb')
     bot.send_photo(chatid, img)
     keyboard = types.InlineKeyboardMarkup()
-    back_button = types.InlineKeyboardButton(text='Назад', callback_data='back')
+
+    add_button = types.InlineKeyboardButton(text='Добавить', callback_data='add, cameras')
+    delete_button = types.InlineKeyboardButton(text='Удалить', callback_data='delete, cameras')
+
+
+        back_button = types.InlineKeyboardButton(text='Назад', callback_data='back')
     buttons = [types.InlineKeyboardButton(text=key, callback_data=key)
                for key in Files.keys()]
     keyboard.add(*buttons)
+    keyboard.add(add_button, delete_button)
     keyboard.add(back_button)
     bot.delete_message(chatid, messageid)
     bot.send_message(chatid, text='Выберите программу:', reply_markup=keyboard)
@@ -38,10 +50,16 @@ def schemes_send(scheme_file, chatid, messageid):
     doc = open(dest_schemes + Schemes.get(scheme_file), 'rb')
     bot.send_document(chatid, doc)
     keyboard = types.InlineKeyboardMarkup()
+
+    add_button = types.InlineKeyboardButton(text='Добавить', callback_data='add, schemes')
+    delete_button = types.InlineKeyboardButton(text='Удалить', callback_data='delete, schemes')
+
     back_button = types.InlineKeyboardButton(text='Назад', callback_data='back')
+
     buttons = [types.InlineKeyboardButton(text=key, callback_data=key)
                for key in Schemes.keys()]
     keyboard.add(*buttons)
+    keyboard.add(add_button, delete_button)
     keyboard.add(back_button)
     bot.delete_message(chatid, messageid)
     bot.send_message(chatid, text='Выбери схему:', reply_markup=keyboard)
@@ -51,10 +69,15 @@ def zoom_send(zoom_file, chatid, messageid):
     img = open(dest_ZOOM + ZOOM.get(zoom_file), 'rb')
     bot.send_photo(chatid, img)
     keyboard = types.InlineKeyboardMarkup()
+
+    add_button = types.InlineKeyboardButton(text='Добавить', callback_data='add, zoom')
+    delete_button = types.InlineKeyboardButton(text='Удалить', callback_data='delete, zoom')
+
     back_button = types.InlineKeyboardButton(text='Назад', callback_data='back')
     buttons = [types.InlineKeyboardButton(text=key, callback_data=key)
                for key in ZOOM.keys()]
     keyboard.add(*buttons)
+    keyboard.add(add_button, delete_button)
     keyboard.add(back_button)
     bot.delete_message(chatid, messageid)
     bot.send_message(chatid, text='Выбери тип трансляции:', reply_markup=keyboard)
@@ -160,6 +183,13 @@ def go_to_main(callback_query):
     messageid = callback_query.message.message_id
     bot.edit_message_reply_markup(chatid, messageid, reply_markup=keyboard)
 
+
+@bot.callback_query_handler(func=lambda call: 'delete')
+def go_to_main(callback_query):
+    keyboard = create_keyboard()
+    chatid = callback_query.message.chat.id
+    messageid = callback_query.message.message_id
+    bot.edit_message_reply_markup(chatid, messageid, reply_markup=keyboard)
 
 if __name__ == '__main__':
     try:
