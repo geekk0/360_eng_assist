@@ -1,30 +1,3 @@
-Files = {
-    'простые правила': 'prostie_pravila.png',
-    'было-стало': 'bilo_stalo.png',
-    'есть': 'est.png',
-    'интервью': 'interview.png',
-    'круг проблем': 'krug_problem.png',
-    'острый вопрос': 'ostriy_vopros.png',
-    'от первого лица': 'ot_pervogo_lica.png',
-    'самое яркое': 'samoe_yarkoe.png',
-    'страна индустрия': 'strana_industriya.png',
-    'топ5': 'top5.png',
-    'фактор роста': 'faktor_rosta.png'
-}
-
-Schemes = {
-     'асб1': 'ASB1_scheme.pdf',
-     'асб2': 'ASB2_scheme.pdf',
-     'асб3': 'ASB3_scheme.pdf',
-     'центральная': 'CAR_scheme.pdf',
-     'апб': 'APB_scheme.pdf',
-     'акадо': 'AKADO_scheme.pdf',
-     'всетв': 'VSE_TV_scheme.pdf',
-     'казахстан': 'Kazah_scheme.pdf'
-}
-
-ZOOM = {
-      'zoomинтервью': 'Interview.png',
-      'zoom': 'Zoom.png',
-      'zoom+intercom': 'Zoom + intercom.png'  
-}
+Files = {'фактор роста': 'faktor_rosta.png', 'xfghj': '/камеры/xfghj.jpg', 'ost': '/камеры/ost.jpg', 'ov': '/home/gekk0/PycharmProjects/360_eng_assist/камеры/ov.jpg', 'fr': 'fr.jpg', 'dasf': 'dasf.jpg', 'samoya': 'samoya.jpg', 'otpe': 'otpe.jpg', 'intv': 'intv.jpg', 'bs': 'bs.jpg', 'wert': 'wert.jpg', 'pp': 'pp.jpg', 'dsd': 'dsd.jpg', 'юююююююю': 'юююююююю.jpg', 'ovu': 'ovu.jpg', 'fghjkl': 'fghjkl.jpg', 'b-s': 'b-s.jpg', 'feeef': 'feeef.jpg', 'qdwqdqwq5555': 'qdwqdqwq5555.jpg'}
+Schemes = {'асб3': 'ASB3_scheme.pdf', 'всетв': 'VSE_TV_scheme.pdf', 'казахстан': 'Kazah_scheme.pdf', 'dedqwqd': 'dedqwqd.pdf', 'nnnnnnnnnnnn': 'nnnnnnnnnnnn.pdf', 'qwdwqdwqd3333333': 'qwdwqdwqd3333333.pdf'}
+ZOOM = {'zoom': 'Zoom.png', 'fghjk': '/home/gekk0/PycharmProjects/360_eng_assist/ZOOM/fghjk.jpg', 'vmix': 'vmix.jpg', 'z+i': 'z+i.jpg', 'vm': 'vm.jpg', 'qwert': 'qwert.jpg', 'zoo': 'zoo.jpg', 'vmi': 'vmi.jpg', 'sk': 'sk.jpg', 'vmixx': 'vmixx.jpg', 'ячсми': 'ячсми.jpg', 'ФФФФФФФФФФФФФФ': 'ФФФФФФФФФФФФФФ.jpg', 'bbbbbbbbbbb': 'bbbbbbbbbbb.jpg', 'bnm,.': 'bnm,..jpg', 'inve': 'inve.jpg', 'efefeeee': 'efefeeee.jpg', '222222222dddddddddd': '222222222dddddddddd.jpg'}
