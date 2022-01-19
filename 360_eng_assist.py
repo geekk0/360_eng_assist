@@ -118,8 +118,10 @@ def poslednie_otcheti(message):
     raw_response = requests.get(url='http://188.225.38.178:8888/api/', auth=('360_admin', 'X5mYdBZ984aqFHoN'))
     response_dict = json.loads(raw_response.text)
 
-    if r.text:
-        bot.send_message(message.chat.id, r.text)
+    last_records = get_last_records(response_dict)
+
+    if last_records:
+        bot.send_message(message.chat.id, last_records)
     else:
         bot.send_message(message.chat.id, 'no response')
 
