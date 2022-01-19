@@ -114,14 +114,12 @@ def chat_id(callback_query):
 
 @bot.message_handler(commands=['poslednie_otcheti'])
 def poslednie_otcheti(message):
-    r = requests.Request(method='GET', url='127.0.0.1:8000/api/')
-    keyboard = create_keyboard(message.chat.id)
-    print(type(r))
-    print(r.data)
-    if r.data:
-        bot.send_message(message.chat.id, r.data, reply_markup=keyboard)
+    r = requests.get(url='http://188.225.38.178:8888/api/', auth=('360_admin', 'X5mYdBZ984aqFHoN'))
+    print(r.text)
+    if r.text:
+        bot.send_message(message.chat.id, r.text)
     else:
-        bot.send_message(message.chat.id, 'no response', reply_markup=keyboard)
+        bot.send_message(message.chat.id, 'no response')
 
 
 @bot.message_handler(commands=['otpuska'])
