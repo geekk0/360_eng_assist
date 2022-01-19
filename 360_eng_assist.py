@@ -115,15 +115,24 @@ def chat_id(callback_query):
 
 @bot.message_handler(commands=['poslednie_otcheti'])
 def poslednie_otcheti(message):
-    r = requests.get(url='http://188.225.38.178:8888/api/', auth=('360_admin', 'X5mYdBZ984aqFHoN'))
-    r_dict = json.loads(r.text)
-    print(type(r.text))
-    print(type(r_dict))
-    print(r_dict)
+    raw_response = requests.get(url='http://188.225.38.178:8888/api/', auth=('360_admin', 'X5mYdBZ984aqFHoN'))
+    response_dict = json.loads(raw_response.text)
+
     if r.text:
         bot.send_message(message.chat.id, r.text)
     else:
         bot.send_message(message.chat.id, 'no response')
+
+
+def get_last_records(response_dict):
+    last_records = ''
+
+    for record in response_dict:
+        last_records += record.get('report_date')
+        last_records += ' ' + record.get('author_name') + ': \n'
+        last_records += record.get('text') + '\n'
+
+    return last_records
 
 
 @bot.message_handler(commands=['otpuska'])
