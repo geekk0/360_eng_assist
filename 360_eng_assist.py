@@ -113,10 +113,10 @@ def chat_id(callback_query):
 
 
 @bot.message_handler(commands=['poslednie_otcheti'])
-def poslednie_otcheti(chatid, messageid):
+def poslednie_otcheti(chatid):
     r = requests.Request(method='GET', url='127.0.0.1:8000/api/')
     keyboard = create_keyboard(chatid)
-    bot.delete_message(chatid, messageid)
+    bot.delete_message(chatid)
     bot.send_message(chatid, r.data, reply_markup=keyboard)
 
 
