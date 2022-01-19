@@ -2,6 +2,7 @@ import requests
 import telebot
 import os
 import time
+import json
 from ntoken import TOKEN
 from config import dest_cameras, dest_schemes, dest_ZOOM
 from DB import Files, Schemes, ZOOM
@@ -115,7 +116,10 @@ def chat_id(callback_query):
 @bot.message_handler(commands=['poslednie_otcheti'])
 def poslednie_otcheti(message):
     r = requests.get(url='http://188.225.38.178:8888/api/', auth=('360_admin', 'X5mYdBZ984aqFHoN'))
+    r_dict = json.loads(r.text)
     print(type(r.text))
+    print(type(r_dict))
+    print(r_dict)
     if r.text:
         bot.send_message(message.chat.id, r.text)
     else:
