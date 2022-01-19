@@ -116,7 +116,10 @@ def chat_id(callback_query):
 def poslednie_otcheti(chatid):
     r = requests.Request(method='GET', url='127.0.0.1:8000/api/')
     keyboard = create_keyboard(chatid)
-    bot.send_message(chatid, r.data, reply_markup=keyboard)
+    if r.data:
+        bot.send_message(chatid, r.data, reply_markup=keyboard)
+    else:
+        bot.send_message(chatid, 'no response', reply_markup=keyboard)
 
 
 @bot.message_handler(commands=['otpuska'])
