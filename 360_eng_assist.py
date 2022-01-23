@@ -115,7 +115,8 @@ def chat_id(callback_query):
 
 @bot.message_handler(commands=['poslednie_otcheti'])
 def poslednie_otcheti(message):
-    raw_response = requests.get(url='http://188.225.38.178:8888/api/', auth=('360_admin', 'X5mYdBZ984aqFHoN'))
+    raw_response = requests.get(url='http://188.225.38.178:8888/api/', auth=('360_admin', 'X5mYdBZ984aqFHoN'),
+                                params={'days': 1})
     response_dict = json.loads(raw_response.text)
 
     last_records = get_last_records(response_dict)
