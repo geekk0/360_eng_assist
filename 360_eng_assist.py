@@ -10,7 +10,6 @@ import schedule
 from threading import Thread
 from time import sleep
 from ntoken import TOKEN
-from ntoken import location
 from config import dest_cameras, dest_schemes, dest_ZOOM
 from DB import Files, Schemes, ZOOM
 from telebot import types
