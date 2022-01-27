@@ -16,6 +16,7 @@ from telebot import types
 
 
 bot = telebot.TeleBot(TOKEN)
+
 argument = 'main'
 
 SchemesV = Schemes
