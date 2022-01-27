@@ -32,8 +32,7 @@ smena_2 = ast.literal_eval(db_data.splitlines()[4])
 smena_3 = ast.literal_eval(db_data.splitlines()[5])
 smena_4 = ast.literal_eval(db_data.splitlines()[6])
 every_day = ast.literal_eval(db_data.splitlines()[7])
-location = db_data.splitlines(()[8])
-
+location = db_data.splitlines()[8]
 
 commands_for_buttons = {'otpuska': 'Отпуска', 'ip_adr': 'ip', 'asb3bank': 'asb3bank', 'schemes_list': 'Схемы',
                         'cameras_list': 'Камеры', 'zoom_list': 'Zoom', 'journal': 'journal'}
