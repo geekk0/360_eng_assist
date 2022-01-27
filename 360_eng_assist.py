@@ -190,7 +190,7 @@ def journal(chatid, messageid):
     smena_3_button = types.InlineKeyboardButton(text='Астахов и Козлов', callback_data='subscribe smena_3')
     smena_4_button = types.InlineKeyboardButton(text='Бороздин и Долгов', callback_data='subscribe smena_4')
 
-    keyboard.add(one_day_button, smena_1_button, smena_2_button, smena_3_button, smena_4_button)
+    keyboard.add(smena_1_button, smena_2_button, smena_3_button, smena_4_button, one_day_button)
     keyboard.add(back_button)
     bot.send_message(chatid, "Выберите тип рассылки:",reply_markup=keyboard)
 
