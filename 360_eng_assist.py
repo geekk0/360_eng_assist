@@ -1,23 +1,42 @@
+import datetime
+
 import requests
 import telebot
 import os
 import time
 import json
+import ast
+import schedule
+from threading import Thread
+from time import sleep
 from ntoken import TOKEN
+from ntoken import location
 from config import dest_cameras, dest_schemes, dest_ZOOM
 from DB import Files, Schemes, ZOOM
 from telebot import types
 
-bot = telebot.TeleBot(TOKEN)
 
+bot = telebot.TeleBot(TOKEN)
 argument = 'main'
 
 SchemesV = Schemes
 FilesV = Files
 ZOOMV = ZOOM
 
+f = open("DB.py", "r")
+db_data = f.read()
+f.close()
+
+smena_1 = ast.literal_eval(db_data.splitlines()[3])
+smena_2 = ast.literal_eval(db_data.splitlines()[4])
+smena_3 = ast.literal_eval(db_data.splitlines()[5])
+smena_4 = ast.literal_eval(db_data.splitlines()[6])
+every_day = ast.literal_eval(db_data.splitlines()[7])
+location = db_data.splitlines(()[8])
+
+
 commands_for_buttons = {'otpuska': 'Отпуска', 'ip_adr': 'ip', 'asb3bank': 'asb3bank', 'schemes_list': 'Схемы',
-                        'cameras_list': 'Камеры', 'zoom_list': 'Zoom'}
+                        'cameras_list': 'Камеры', 'zoom_list': 'Zoom', 'journal': 'journal'}
 commands_string = ''.join('{}{}'.format(key, val) for key, val in commands_for_buttons.items())
 
 
@@ -95,6 +114,10 @@ def zoom_send(zoom_file, chatid, messageid):
     bot.send_message(chatid, text='Выбери тип трансляции:', reply_markup=keyboard)
 
 
+def schedule_checker():
+    while True:
+        schedule.run_pending()
+        sleep(1)
 
 
 @bot.message_handler(commands=['start'])
@@ -105,30 +128,117 @@ def start_message(message):
     bot.send_message(message.chat.id, 'Привет! Данные ... надо бы обновить', reply_markup=keyboard)
 
 
-
 @bot.callback_query_handler(func=lambda call: 'chatid' in call.data)
 def chat_id(callback_query):
     chatid = callback_query.message.chat.id
     bot.send_message(chatid, chatid)
 
 
+""""@bot.message_handler(commands=['poslednie_otcheti'])
+def poslednie_otcheti():
+    for key in users:
 
-@bot.message_handler(commands=['poslednie_otcheti'])
-def poslednie_otcheti(message):
-    raw_response = requests.get(url='http://188.225.38.178:8888/api/last_records/',
-                                auth=('360_admin', 'X5mYdBZ984aqFHoN'), params={'days': '1'})
-    print(raw_response.url)
-    response_dict = json.loads(raw_response.text)
+        try:
 
-    last_records = get_last_records(response_dict)
+            raw_response = requests.get(url='http://127.0.0.1:5000/api/last_records/',
+                                        auth=(users.get(key)[0], users.get(key)[1]), params={'days': '1'})
 
-    if last_records:
-        bot.send_message(message.chat.id, last_records)
-    else:
-        bot.send_message(message.chat.id, 'no response')
+            response_dict = json.loads(raw_response.text)
+
+            last_records = format_last_records(response_dict)
+
+            if last_records:
+                bot.send_message(key, last_records)
+            else:
+                bot.send_message(key, 'no response')
+
+        except:
+
+            bot.send_message(key, "Авторизация не пройдена, попробуйте заново внести данные")
 
 
-def get_last_records(response_dict):
+@bot.callback_query_handler(func=lambda call: 'auth_data' in call.data)
+def authorization_view(callback_query):
+    keyboard = types.InlineKeyboardMarkup()
+    back_button = types.InlineKeyboardButton(text='Назад', callback_data='back')
+    bot.delete_message(callback_query.message.chat.id, callback_query.message.message_id)
+    keyboard.add(back_button)
+
+    bot.send_message(callback_query.message.chat.id, 'Данные для авторизации отправлены', reply_markup=keyboard)
+
+
+@bot.message_handler(func=lambda message: True)
+def add_user_data(message):
+    login = message.text.splitlines()[0]
+    if login[1] == '.' and len(message.text) > len(login):
+        password = message.text.splitlines()[1]
+        users[message.chat.id] = [login, password]
+        save_values()
+        bot.send_message(message.chat.id, "user added")
+
+        bot.send_message(message.chat.id, str(users))"""
+
+
+@bot.message_handler(commands=['journal'])
+def journal(chatid, messageid):
+    keyboard = types.InlineKeyboardMarkup()
+    bot.delete_message(chatid, messageid)
+    back_button = types.InlineKeyboardButton(text='Назад', callback_data='back')
+
+    one_day_button = types.InlineKeyboardButton(text='Получать отчеты каждый день', callback_data='subscribe every_day')
+    smena_1_button = types.InlineKeyboardButton(text='Рославцев и Сидоренко', callback_data='subscribe smena_1')
+    smena_2_button = types.InlineKeyboardButton(text='Литвиненко и Мех', callback_data='subscribe smena_2')
+    smena_3_button = types.InlineKeyboardButton(text='Астахов и Козлов', callback_data='subscribe smena_3')
+    smena_4_button = types.InlineKeyboardButton(text='Бороздин и Долгов', callback_data='subscribe smena_4')
+
+    keyboard.add(one_day_button, smena_1_button, smena_2_button, smena_3_button, smena_4_button)
+    keyboard.add(back_button)
+    bot.send_message(chatid, "Выберите тип рассылки:",reply_markup=keyboard)
+
+
+@bot.callback_query_handler(func=lambda call: 'subscribe' in call.data)
+def add_subscriber(callback_query):
+    sub_type = callback_query.data[-10:]
+    if "every_day" in sub_type and callback_query.message.chat.id not in every_day:
+        every_day.append(callback_query.message.chat.id)
+    elif "smena_1" in sub_type and callback_query.message.chat.id not in smena_1:
+        smena_1.append(callback_query.message.chat.id)
+    elif "smena_2" in sub_type and callback_query.message.chat.id not in smena_2:
+        smena_2.append(callback_query.message.chat.id)
+    elif "smena_3" in sub_type and callback_query.message.chat.id not in smena_3:
+        smena_3.append(callback_query.message.chat.id)
+    elif "smena_4" in sub_type and callback_query.message.chat.id not in smena_4:
+        smena_4.append(callback_query.message.chat.id)
+    save_values()
+
+def get_last_records(smena, records):
+    for user_chat_id in smena:
+
+        if user_chat_id:
+
+            dev_url = 'http://127.0.0.1:5000/api/last_records/'
+
+            prod_url = 'http://188.225.38.178:8888/api/last_records/'
+
+            if location == "dev":
+                current_url = dev_url
+            else:
+                current_url = prod_url
+
+            raw_response = requests.get(url=current_url, auth=("360_admin", "X5mYdBZ984aqFHoN"),
+                                        params={'days': records})
+
+            response_dict = json.loads(raw_response.text)
+
+            last_records = format_last_records(response_dict)
+
+            if last_records:
+                bot.send_message(user_chat_id, last_records)
+            else:
+                bot.send_message(user_chat_id, 'no response')
+
+
+def format_last_records(response_dict):
     last_records = ''
 
     for record in response_dict:
@@ -381,25 +491,19 @@ def remove_cell(callback_query):
 
         Schemes.pop(argument)
 
-        f = open('DB.py', 'w')
-        f.write(str('Files = ' + str(FilesV))+'\n'+str('Schemes = ' + str(SchemesV)+'\n'+str('ZOOM = ' + str(ZOOMV))))
-        f.close()
+        save_values()
 
     if argument in FilesV:
 
         Files.pop(argument)
 
-        f = open('DB.py', 'w')
-        f.write(str('Files = ' + str(FilesV))+'\n'+str('Schemes = ' + str(SchemesV)+'\n'+str('ZOOM = ' + str(ZOOMV))))
-        f.close()
+        save_values()
 
     if argument in ZOOMV:
 
         ZOOM.pop(argument)
 
-        f = open('DB.py', 'w')
-        f.write(str('Files = ' + str(FilesV))+'\n'+str('Schemes = ' + str(SchemesV)+'\n'+str('ZOOM = ' + str(ZOOMV))))
-        f.close()
+        save_values()
 
 
 @bot.message_handler(content_types=['photo'])
@@ -423,19 +527,14 @@ def add_image(message):
             src = dest_cameras
 
             FilesV[message.caption] = message.caption+'.jpg'
-            f = open('DB.py', 'w')
-            f.write(str('Files = ' + str(FilesV)) + '\n' + str(
-                'Schemes = ' + str(SchemesV) + '\n' + str('ZOOM = ' + str(ZOOMV))))
-            f.close()
+
+            save_values()
 
         if argument == 'zoom_list':
             src = dest_ZOOM
 
             ZOOMV[message.caption] = message.caption + '.jpg'
-            f = open('DB.py', 'w')
-            f.write(str('Files = ' + str(FilesV)) + '\n' + str(
-                'Schemes = ' + str(SchemesV) + '\n' + str('ZOOM = ' + str(ZOOMV))))
-            f.close()
+            save_values()
 
         script_dest = os.getcwd()
 
@@ -470,10 +569,7 @@ def add_doc(message):
             src = dest_schemes
 
             SchemesV[message.caption] = message.caption + '.pdf'
-            f = open('DB.py', 'w')
-            f.write(str('Files = ' + str(FilesV)) + '\n' + str(
-                'Schemes = ' + str(SchemesV) + '\n' + str('ZOOM = ' + str(ZOOMV))))
-            f.close()
+            save_values()
 
             script_dest = os.getcwd()
 
@@ -502,7 +598,31 @@ def go_to_main(callback_query):
     bot.edit_message_text('Выберите раздел:', chatid, messageid, reply_markup=keyboard)
 
 
+def save_values():
+    f = open('DB.py', 'w')
+    f.write(
+        str('Files = ' + str(FilesV)) + '\n' + str('Schemes = ' + str(SchemesV) + '\n' + str('ZOOM = ' + str(ZOOMV)) +
+                                                   '\n' + str(str(smena_1)) + '\n' + str(str(smena_2)) + '\n' +
+                                                   str(str(smena_3)) + '\n' + str(str(smena_4)) + '\n' +
+                                                   str(str(every_day)) ))
+    f.close()
+
 if __name__ == '__main__':
+
+    if str(datetime.date.today()) == '2022-01-27':
+        schedule.every(4).days.at("09:21").do(get_last_records, smena=smena_3, days=3)
+    if str(datetime.date.today()) == '2022-01-28':
+        schedule.every(4).days.at("09:21").do(get_last_records, smena=smena_4, days=3)
+    if str(datetime.date.today()) == '2022-01-29':
+        schedule.every(4).days.at("09:21").do(get_last_records, smena=smena_1, days=3)
+    if str(datetime.date.today()) == '2022-01-30':
+        schedule.every(4).days.at("09:21").do(get_last_records, smena=smena_2, days=3)
+    if str(datetime.date.today()) == '2022-01-27':
+        schedule.every(4).days.at("10:00").do(get_last_records, smena=every_day, days=1)
+
+
+    Thread(target=schedule_checker).start()
+    schedule.run_pending()
     try:
         bot.infinity_polling(True)
     except:
