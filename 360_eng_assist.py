@@ -660,7 +660,7 @@ if __name__ == '__main__':
         schedule.every(4).days.at("09:21").do(get_last_records, smena=smena_1, days=3)
     if str(datetime.date.today()) == '2022-01-30':
         schedule.every(4).days.at("09:21").do(get_last_records, smena=smena_2, days=3)
-    if str(datetime.date.today()) == '2022-01-30':
+    if str(datetime.date.today()) == '2022-01-29':
         schedule.every(4).days.at("10:00").do(get_last_records, smena=every_day, days=1)
 
 
