@@ -35,7 +35,7 @@ every_day = ast.literal_eval(db_data.splitlines()[7])
 location = db_data.splitlines()[8]
 
 commands_for_buttons = {'otpuska': 'Отпуска', 'ip_adr': 'ip', 'asb3bank': 'asb3bank', 'schemes_list': 'Схемы',
-                        'cameras_list': 'Камеры', 'zoom_list': 'Zoom', 'journal': 'journal'}
+                        'cameras_list': 'Камеры', 'zoom_list': 'Zoom', 'journal': 'Журнал'}
 commands_string = ''.join('{}{}'.format(key, val) for key, val in commands_for_buttons.items())
 
 
@@ -184,47 +184,91 @@ def journal(chatid, messageid):
     bot.delete_message(chatid, messageid)
     back_button = types.InlineKeyboardButton(text='Назад', callback_data='back')
 
-    one_day_button = types.InlineKeyboardButton(text='Получать отчеты каждый день', callback_data='subscribe every_day')
+    one_day_button = types.InlineKeyboardButton(text='Каждый день', callback_data='subscribe every_day')
     smena_1_button = types.InlineKeyboardButton(text='Рославцев и Сидоренко', callback_data='subscribe smena_1')
     smena_2_button = types.InlineKeyboardButton(text='Литвиненко и Мех', callback_data='subscribe smena_2')
     smena_3_button = types.InlineKeyboardButton(text='Астахов и Козлов', callback_data='subscribe smena_3')
     smena_4_button = types.InlineKeyboardButton(text='Бороздин и Долгов', callback_data='subscribe smena_4')
+    unsubscribe_button = types.InlineKeyboardButton(text="Отписаться", callback_data="cancel")
 
-    keyboard.add(smena_1_button, smena_2_button, smena_3_button, smena_4_button, one_day_button)
+    keyboard.add(smena_1_button, smena_2_button, smena_3_button, smena_4_button, one_day_button, unsubscribe_button)
     keyboard.add(back_button)
-    bot.send_message(chatid, "Выберите тип рассылки:",reply_markup=keyboard)
+    bot.send_message(chatid, "Выберите тип рассылки:", reply_markup=keyboard)
 
 
 @bot.callback_query_handler(func=lambda call: 'subscribe' in call.data)
 def add_subscriber(callback_query):
     sub_type = callback_query.data[-10:]
+
+    keyboard = types.InlineKeyboardMarkup()
+    back_button = types.InlineKeyboardButton(text='Назад', callback_data='back')
+    unsubscribe_button = types.InlineKeyboardButton(text="Отписаться", callback_data="cancel")
+    keyboard.add(unsubscribe_button, back_button)
+
     if "every_day" in sub_type and callback_query.message.chat.id not in every_day:
         every_day.append(callback_query.message.chat.id)
+        bot.edit_message_text(chat_id=callback_query.message.chat.id, message_id=callback_query.message.message_id,
+                              text="Рассылка на каждый день добавлена", reply_markup=keyboard)
     elif "smena_1" in sub_type and callback_query.message.chat.id not in smena_1:
         smena_1.append(callback_query.message.chat.id)
+        bot.edit_message_text(chat_id=callback_query.message.chat.id, message_id=callback_query.message.message_id,
+                              text="Рассылка Рославцев и Сидоренко добавлена", reply_markup=keyboard)
     elif "smena_2" in sub_type and callback_query.message.chat.id not in smena_2:
         smena_2.append(callback_query.message.chat.id)
+        bot.edit_message_text(chat_id=callback_query.message.chat.id, message_id=callback_query.message.message_id,
+                              text="Рассылка Литвиненко и Мех добавлена", reply_markup=keyboard)
     elif "smena_3" in sub_type and callback_query.message.chat.id not in smena_3:
         smena_3.append(callback_query.message.chat.id)
+        bot.edit_message_text(chat_id=callback_query.message.chat.id, message_id=callback_query.message.message_id,
+                              text="Рассылка Астахов и Козлов добавлена", reply_markup=keyboard)
     elif "smena_4" in sub_type and callback_query.message.chat.id not in smena_4:
         smena_4.append(callback_query.message.chat.id)
+        bot.edit_message_text(chat_id=callback_query.message.chat.id, message_id=callback_query.message.message_id,
+                              text="Рассылка Бороздин и Долговв добавлена", reply_markup=keyboard)
+
     save_values()
+
+
+@bot.callback_query_handler(func=lambda call: 'cancel' in call.data)
+def unsubscribe(callback_query):
+    chat_id = callback_query.message.chat.id
+
+    keyboard = types.InlineKeyboardMarkup()
+    back_button = types.InlineKeyboardButton(text='Назад', callback_data='back')
+    keyboard.add(back_button)
+
+    if chat_id in smena_1:
+        smena_1.remove(chat_id)
+    elif chat_id in smena_2:
+        smena_2.remove(chat_id)
+    elif chat_id in smena_3:
+        smena_3.remove(chat_id)
+    elif chat_id in smena_4:
+        smena_4.remove(chat_id)
+    elif chat_id in every_day:
+        every_day.remove(chat_id)
+
+    bot.edit_message_text(chat_id=callback_query.message.chat.id, message_id=callback_query.message.message_id,
+                          text="Рассылка отменена", reply_markup=keyboard)
+
+    save_values()
+
+
+
 
 def get_last_records(smena, records):
     for user_chat_id in smena:
 
         if user_chat_id:
 
-            dev_url = 'http://127.0.0.1:5000/api/last_records/'
-
-            prod_url = 'http://188.225.38.178:8888/api/last_records/'
-
             if location == "dev":
-                current_url = dev_url
+                current_url = 'http://127.0.0.1:5000/api/last_records/'
+                auth_data = "360_admin", "X5mYdBZ984aqFHoN"
             else:
-                current_url = prod_url
+                current_url = 'http://188.225.38.178:8888/api/last_records/'
+                auth_data = "Journal360", "Ju123456"
 
-            raw_response = requests.get(url=current_url, auth=("360_admin", "X5mYdBZ984aqFHoN"),
+            raw_response = requests.get(url=current_url, auth=(auth_data),
                                         params={'days': records})
 
             response_dict = json.loads(raw_response.text)
@@ -601,22 +645,22 @@ def save_values():
     f = open('DB.py', 'w')
     f.write(
         str('Files = ' + str(FilesV)) + '\n' + str('Schemes = ' + str(SchemesV) + '\n' + str('ZOOM = ' + str(ZOOMV)) +
-                                                   '\n' + str(str(smena_1)) + '\n' + str(str(smena_2)) + '\n' +
-                                                   str(str(smena_3)) + '\n' + str(str(smena_4)) + '\n' +
-                                                   str(str(every_day)) ))
+                                                   '\n' + str(smena_1) + '\n' + str(smena_2) + '\n' +
+                                                   str(smena_3) + '\n' + str(smena_4) + '\n' +
+                                                   str(every_day) + '\n' + str(location) ))
     f.close()
 
 if __name__ == '__main__':
 
-    if str(datetime.date.today()) == '2022-01-27':
+    if str(datetime.date.today()) == '2022-01-31':
         schedule.every(4).days.at("09:21").do(get_last_records, smena=smena_3, days=3)
-    if str(datetime.date.today()) == '2022-01-28':
+    if str(datetime.date.today()) == '2022-02-01':
         schedule.every(4).days.at("09:21").do(get_last_records, smena=smena_4, days=3)
     if str(datetime.date.today()) == '2022-01-29':
         schedule.every(4).days.at("09:21").do(get_last_records, smena=smena_1, days=3)
     if str(datetime.date.today()) == '2022-01-30':
         schedule.every(4).days.at("09:21").do(get_last_records, smena=smena_2, days=3)
-    if str(datetime.date.today()) == '2022-01-27':
+    if str(datetime.date.today()) == '2022-01-30':
         schedule.every(4).days.at("10:00").do(get_last_records, smena=every_day, days=1)
 
 
