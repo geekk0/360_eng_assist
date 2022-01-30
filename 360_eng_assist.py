@@ -254,27 +254,33 @@ def unsubscribe(callback_query):
     save_values()
 
 
-
-
 def get_last_records(smena, records):
     for user_chat_id in smena:
 
         if user_chat_id:
 
+            url = "http://127.0.0.1:5000/api/last_records/"
+            login = "360_admin"
+            password = "X5mYdBZ984aqFHoN"
+
             if location == "dev":
-                current_url = 'http://127.0.0.1:5000/api/last_records/'
-                auth_data = "360_admin", "X5mYdBZ984aqFHoN"
-            elif location == "vds":
-                current_url = 'http://188.225.38.178:8888/api/last_records/'
-                auth_data = "360_admin", "X5mYdBZ984aqFHoN"
-            else:
-                current_url = "https://journal.360tv.ru/api/last_records/"
-                auth_data = "Journal360", "Ju123456"
+
+                url = "http://127.0.0.1:5000/api/last_records/"
+                login = "360_admin"
+                password = "X5mYdBZ984aqFHoN"
+
+            if location == "vds":
+
+                url = "http://188.225.38.178:8888/api/last_records/"
+
+            if location == "prod":
+
+                url = "https://journal.360tv.ru//api/last_records/"
+                login = admin
+                password = "5Du~EVNtf~8H"
 
 
-            raw_response = requests.get(url=current_url, auth=(auth_data),
-                                        params={'days': records})
-
+            raw_response = requests.get(url=url, auth=(login, password), params={'days': records})
             response_dict = json.loads(raw_response.text)
 
             last_records = format_last_records(response_dict)
@@ -657,16 +663,15 @@ def save_values():
 if __name__ == '__main__':
 
     if str(datetime.date.today()) == '2022-01-31':
-        schedule.every(4).days.at("09:21").do(get_last_records, smena=smena_3, days=3)
+        schedule.every(4).days.at("09:21").do(get_last_records, smena=smena_3, records=3)
     if str(datetime.date.today()) == '2022-02-01':
-        schedule.every(4).days.at("09:21").do(get_last_records, smena=smena_4, days=3)
-    if str(datetime.date.today()) == '2022-01-29':
-        schedule.every(4).days.at("09:21").do(get_last_records, smena=smena_1, days=3)
+        schedule.every(4).days.at("09:21").do(get_last_records, smena=smena_4, records=3)
+    if str(datetime.date.today()) == '2022-02-02':
+        schedule.every(4).days.at("09:21").do(get_last_records, smena=smena_1, records=3)
     if str(datetime.date.today()) == '2022-01-30':
-        schedule.every(4).days.at("09:21").do(get_last_records, smena=smena_2, days=3)
-    if str(datetime.date.today()) == '2022-01-29':
-        schedule.every(4).days.at("15:55").do(get_last_records, smena=every_day, days=1)
-
+        schedule.every(4).days.at("09:21").do(get_last_records, smena=smena_2, records=3)
+    if str(datetime.date.today()) == '2022-01-30':
+        schedule.every().days.at("10:00").do(get_last_records, smena=every_day, records=1)
 
     Thread(target=schedule_checker).start()
     schedule.run_pending()
