@@ -7,7 +7,7 @@ import ast
 import schedule
 from time import sleep
 from ntoken import TOKEN
-from config import dest_cameras, dest_schemes, dest_ZOOM
+from config import dest_cameras, dest_schemes, dest_ZOOM, url, login, password
 from DB import Files, Schemes, ZOOM
 from schedule import start_date_every_day, start_date_smena_1, start_date_smena_2, start_date_smena_3, start_date_smena_4
 from telebot import types
@@ -30,7 +30,6 @@ smena_2 = ast.literal_eval(db_data.splitlines()[4])
 smena_3 = ast.literal_eval(db_data.splitlines()[5])
 smena_4 = ast.literal_eval(db_data.splitlines()[6])
 every_day = ast.literal_eval(db_data.splitlines()[7])
-location = db_data.splitlines()[8]
 
 commands_for_buttons = {'otpuska': 'Отпуска', 'ip_adr': 'ip', 'asb3bank': 'asb3bank', 'schemes_list': 'Схемы',
                         'cameras_list': 'Камеры', 'zoom_list': 'Zoom', 'journal': 'Журнал'}
@@ -212,31 +211,6 @@ def get_last_records(smena, records):
     for user_chat_id in smena:
 
         if user_chat_id:
-
-            print(location)
-
-            url = "http://127.0.0.1:5000/api/last_records/"
-            login = "360_admin"
-            password = "X5mYdBZ984aqFHoN"
-
-            if location == "dev":
-
-                url = "http://127.0.0.1:5000/api/last_records/"
-                login = "360_admin"
-                password = "X5mYdBZ984aqFHoN"
-
-            if location == "vds":
-
-                print("VDS running")
-
-                url = "http://188.225.38.178:8888/api/last_records/"
-
-            if location == "prod":
-
-                url = "https://journal.360tv.ru//api/last_records/"
-                login = "admin"
-                password = "5Du~EVNtf~8H"
-
 
             raw_response = requests.get(url=url, auth=(login, password), params={'days': records})
             response_dict = json.loads(raw_response.text)
@@ -615,7 +589,7 @@ def save_values():
         str('Files = ' + str(FilesV)) + '\n' + str('Schemes = ' + str(SchemesV) + '\n' + str('ZOOM = ' + str(ZOOMV)) +
                                                    '\n' + str(smena_1) + '\n' + str(smena_2) + '\n' +
                                                    str(smena_3) + '\n' + str(smena_4) + '\n' +
-                                                   str(every_day) + '\n' + str(location) ))
+                                                   str(every_day)))
     f.close()
 
 
