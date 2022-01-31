@@ -213,6 +213,8 @@ def get_last_records(smena, records):
 
         if user_chat_id:
 
+            print(location)
+
             url = "http://127.0.0.1:5000/api/last_records/"
             login = "360_admin"
             password = "X5mYdBZ984aqFHoN"
