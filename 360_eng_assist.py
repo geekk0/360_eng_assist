@@ -225,6 +225,8 @@ def get_last_records(smena, records):
 
             if location == "vds":
 
+                print("VDS running")
+
                 url = "http://188.225.38.178:8888/api/last_records/"
 
             if location == "prod":
