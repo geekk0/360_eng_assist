@@ -1,5 +1,3 @@
-import datetime
-
 import requests
 import telebot
 import os
@@ -7,13 +5,13 @@ import time
 import json
 import ast
 import schedule
-from threading import Thread
 from time import sleep
 from ntoken import TOKEN
 from config import dest_cameras, dest_schemes, dest_ZOOM
 from DB import Files, Schemes, ZOOM
+from schedule import start_date_every_day, start_date_smena_1, start_date_smena_2, start_date_smena_3, start_date_smena_4
 from telebot import types
-
+from apscheduler.schedulers.background import BackgroundScheduler
 
 bot = telebot.TeleBot(TOKEN)
 
@@ -115,6 +113,7 @@ def zoom_send(zoom_file, chatid, messageid):
 
 def schedule_checker():
     while True:
+        print(schedule.idle_seconds())
         schedule.run_pending()
         sleep(1)
 
@@ -131,51 +130,6 @@ def start_message(message):
 def chat_id(callback_query):
     chatid = callback_query.message.chat.id
     bot.send_message(chatid, chatid)
-
-
-""""@bot.message_handler(commands=['poslednie_otcheti'])
-def poslednie_otcheti():
-    for key in users:
-
-        try:
-
-            raw_response = requests.get(url='http://127.0.0.1:5000/api/last_records/',
-                                        auth=(users.get(key)[0], users.get(key)[1]), params={'days': '1'})
-
-            response_dict = json.loads(raw_response.text)
-
-            last_records = format_last_records(response_dict)
-
-            if last_records:
-                bot.send_message(key, last_records)
-            else:
-                bot.send_message(key, 'no response')
-
-        except:
-
-            bot.send_message(key, "Авторизация не пройдена, попробуйте заново внести данные")
-
-
-@bot.callback_query_handler(func=lambda call: 'auth_data' in call.data)
-def authorization_view(callback_query):
-    keyboard = types.InlineKeyboardMarkup()
-    back_button = types.InlineKeyboardButton(text='Назад', callback_data='back')
-    bot.delete_message(callback_query.message.chat.id, callback_query.message.message_id)
-    keyboard.add(back_button)
-
-    bot.send_message(callback_query.message.chat.id, 'Данные для авторизации отправлены', reply_markup=keyboard)
-
-
-@bot.message_handler(func=lambda message: True)
-def add_user_data(message):
-    login = message.text.splitlines()[0]
-    if login[1] == '.' and len(message.text) > len(login):
-        password = message.text.splitlines()[1]
-        users[message.chat.id] = [login, password]
-        save_values()
-        bot.send_message(message.chat.id, "user added")
-
-        bot.send_message(message.chat.id, str(users))"""
 
 
 @bot.message_handler(commands=['journal'])
@@ -276,7 +230,7 @@ def get_last_records(smena, records):
             if location == "prod":
 
                 url = "https://journal.360tv.ru//api/last_records/"
-                login = admin
+                login = "admin"
                 password = "5Du~EVNtf~8H"
 
 
@@ -660,21 +614,31 @@ def save_values():
                                                    str(every_day) + '\n' + str(location) ))
     f.close()
 
+
 if __name__ == '__main__':
 
-    if str(datetime.date.today()) == '2022-01-31':
-        schedule.every(4).days.at("09:21").do(get_last_records, smena=smena_3, records=3)
-    if str(datetime.date.today()) == '2022-02-01':
-        schedule.every(4).days.at("09:21").do(get_last_records, smena=smena_4, records=3)
-    if str(datetime.date.today()) == '2022-02-02':
-        schedule.every(4).days.at("09:21").do(get_last_records, smena=smena_1, records=3)
-    if str(datetime.date.today()) == '2022-01-30':
-        schedule.every(4).days.at("09:21").do(get_last_records, smena=smena_2, records=3)
-    if str(datetime.date.today()) == '2022-01-30':
-        schedule.every().days.at("10:00").do(get_last_records, smena=every_day, records=1)
+    scheduler = BackgroundScheduler(timezone='Europe/Moscow')
 
-    Thread(target=schedule_checker).start()
-    schedule.run_pending()
+    scheduler.add_job(lambda: get_last_records(smena=every_day, records=1), trigger='interval', days=1,
+                      start_date=start_date_every_day, name="last_records_for_every_day",
+                      id='last_records_for_every_day')
+
+    scheduler.add_job(lambda: get_last_records(smena=smena_1, records=3), trigger='interval', days=4,
+                      start_date=start_date_smena_1, name="last_records_for_smena_1", id='last_records_for_smena_1')
+
+    scheduler.add_job(lambda: get_last_records(smena=smena_2, records=3), trigger='interval', days=4,
+                      start_date=start_date_smena_2, name="last_records_for_smena_2", id='last_records_for_smena_2')
+
+    scheduler.add_job(lambda: get_last_records(smena=smena_3, records=3), trigger='interval', days=4,
+                      start_date=start_date_smena_3, name="last_records_for_smena_3", id='last_records_for_smena_3')
+
+    scheduler.add_job(lambda: get_last_records(smena=smena_4, records=3), trigger='interval', days=4,
+                      start_date=start_date_smena_4, name="last_records_for_smena_4", id='last_records_for_smena_4')
+
+    scheduler.print_jobs()
+
+    scheduler.start()
+
     try:
         bot.infinity_polling(True)
     except:
