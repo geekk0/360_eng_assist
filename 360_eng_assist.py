@@ -45,7 +45,7 @@ def create_keyboard(chatid):
 
     add_button = types.InlineKeyboardButton(text='Добавить', callback_data='add, main')
     delete_button = types.InlineKeyboardButton(text='Удалить', callback_data='delete, main')
-    if chatid == 147314671:
+    if chatid == 147314671 or 1019904124:
 
         keyboard.add(add_button, delete_button)
     return keyboard
@@ -64,7 +64,7 @@ def cameras_send(cam_file, chatid, messageid):
     buttons = [types.InlineKeyboardButton(text=key, callback_data=key)
                for key in Files.keys()]
     keyboard.add(*buttons)
-    if chatid == 147314671:
+    if chatid == 147314671 or 1019904124:
         keyboard.add(add_button, delete_button)
     keyboard.add(back_button)
     bot.delete_message(chatid, messageid)
@@ -84,7 +84,7 @@ def schemes_send(scheme_file, chatid, messageid):
     buttons = [types.InlineKeyboardButton(text=key, callback_data=key)
                for key in Schemes.keys()]
     keyboard.add(*buttons)
-    if chatid == 147314671:
+    if chatid == 147314671 or 1019904124:
         keyboard.add(add_button, delete_button)
     keyboard.add(back_button)
     bot.delete_message(chatid, messageid)
@@ -103,7 +103,7 @@ def zoom_send(zoom_file, chatid, messageid):
     buttons = [types.InlineKeyboardButton(text=key, callback_data=key)
                for key in ZOOM.keys()]
     keyboard.add(*buttons)
-    if chatid == 147314671:
+    if chatid == 147314671 or 1019904124:
         keyboard.add(add_button, delete_button)
     keyboard.add(back_button)
     bot.delete_message(chatid, messageid)
@@ -267,7 +267,7 @@ def cameras_list(chatid, messageid):
     back_button = types.InlineKeyboardButton(text='Назад', callback_data='back')
     buttons = [types.InlineKeyboardButton(text=key, callback_data=key) for key in Files.keys()]
     keyboard.add(*buttons)
-    if chatid == 147314671:
+    if chatid == 147314671 or 1019904124:
         add_button = types.InlineKeyboardButton(text='Добавить', callback_data='add,schemes_list')
         delete_button = types.InlineKeyboardButton(text='Удалить', callback_data='delete,schemes_list')
         keyboard.add(add_button, delete_button)
@@ -281,7 +281,7 @@ def schemes_list(chatid, messageid):
     back_button = types.InlineKeyboardButton(text='Назад', callback_data='back')
     buttons = [types.InlineKeyboardButton(text=key, callback_data=key) for key in Schemes.keys()]
     keyboard.add(*buttons)
-    if chatid == 147314671:
+    if chatid == 147314671 or 1019904124:
         add_button = types.InlineKeyboardButton(text='Добавить', callback_data='add,schemes_list')
         delete_button = types.InlineKeyboardButton(text='Удалить', callback_data='delete,schemes_list')
         keyboard.add(add_button, delete_button)
@@ -295,7 +295,7 @@ def zoom_list(chatid, messageid):
     back_button = types.InlineKeyboardButton(text='Назад', callback_data='back')
     buttons = [types.InlineKeyboardButton(text=key, callback_data=key) for key in ZOOM.keys()]
     keyboard.add(*buttons)
-    if chatid == 147314671:
+    if chatid == 147314671 or 1019904124:
         add_button = types.InlineKeyboardButton(text='Добавить', callback_data='add,schemes_list')
         delete_button = types.InlineKeyboardButton(text='Удалить', callback_data='delete,schemes_list')
         keyboard.add(add_button, delete_button)
@@ -597,9 +597,7 @@ if __name__ == '__main__':
 
     scheduler = BackgroundScheduler(timezone='Europe/Moscow')
 
-    scheduler.add_job(lambda: get_last_records(smena=every_day, records=1), trigger='interval', days=1,
-                      start_date=start_date_every_day, name="last_records_for_every_day",
-                      id='last_records_for_every_day')
+    scheduler.add_job(lambda: get_last_records(smena=every_day, records=1), trigger='interval', days=1, start_date=start_date_every_day, name="last_records_for_every_day", id='last_records_for_every_day')
 
     scheduler.add_job(lambda: get_last_records(smena=smena_1, records=3), trigger='interval', days=4,
                       start_date=start_date_smena_1, name="last_records_for_smena_1", id='last_records_for_smena_1')
