@@ -110,13 +110,6 @@ def zoom_send(zoom_file, chatid, messageid):
     bot.send_message(chatid, text='Выбери тип трансляции:', reply_markup=keyboard)
 
 
-def schedule_checker():
-    while True:
-        print(schedule.idle_seconds())
-        schedule.run_pending()
-        sleep(1)
-
-
 @bot.message_handler(commands=['start'])
 def start_message(message):
 
@@ -268,8 +261,8 @@ def cameras_list(chatid, messageid):
     buttons = [types.InlineKeyboardButton(text=key, callback_data=key) for key in Files.keys()]
     keyboard.add(*buttons)
     if chatid == 147314671 or 1019904124:
-        add_button = types.InlineKeyboardButton(text='Добавить', callback_data='add,schemes_list')
-        delete_button = types.InlineKeyboardButton(text='Удалить', callback_data='delete,schemes_list')
+        add_button = types.InlineKeyboardButton(text='Добавить', callback_data='add,cameras_list')
+        delete_button = types.InlineKeyboardButton(text='Удалить', callback_data='delete,cameras_list')
         keyboard.add(add_button, delete_button)
     keyboard.add(back_button)
     bot.edit_message_text(text='Выберите программу:', chat_id=chatid, message_id=messageid, reply_markup=keyboard)
@@ -296,8 +289,8 @@ def zoom_list(chatid, messageid):
     buttons = [types.InlineKeyboardButton(text=key, callback_data=key) for key in ZOOM.keys()]
     keyboard.add(*buttons)
     if chatid == 147314671 or 1019904124:
-        add_button = types.InlineKeyboardButton(text='Добавить', callback_data='add,schemes_list')
-        delete_button = types.InlineKeyboardButton(text='Удалить', callback_data='delete,schemes_list')
+        add_button = types.InlineKeyboardButton(text='Добавить', callback_data='add,zoom_list')
+        delete_button = types.InlineKeyboardButton(text='Удалить', callback_data='delete,zoom_list')
         keyboard.add(add_button, delete_button)
     keyboard.add(back_button)
     bot.edit_message_text(text='Выберите конфигурацию:', chat_id=chatid, message_id=messageid, reply_markup=keyboard)
