@@ -372,7 +372,7 @@ def delete_mode(callback_query):
 
         keyboard.add(*buttons)
         keyboard.add(ready_button)
-        bot.edit_message_text(text='Удаление схем (по нажатию "Готово"):', chat_id=chatid, message_id=messageid, reply_markup=keyboard)
+        bot.edit_message_text(text='Удаление zoom (по нажатию "Готово"):', chat_id=chatid, message_id=messageid, reply_markup=keyboard)
 
 
 @bot.callback_query_handler(func=lambda call: 'add' in call.data)
