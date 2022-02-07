@@ -7,6 +7,7 @@ import time
 import json
 import ast
 import schedule
+from datetime import datetime
 from time import sleep
 from ntoken import TOKEN
 from config import dest_cameras, dest_schemes, dest_ZOOM, url, login, password
@@ -223,7 +224,8 @@ def format_last_records(response_dict):
 
     for record in response_dict:
         try:
-            last_records += record.get('report_date')
+            date = record.get('report_date')
+            last_records += str((datetime.strptime(date, "%Y-%m-%d")).strftime("%d.%m.%Y"))
             last_records += ' ' + record.get('author_name') + ': \n'
             last_records += record.get('text') + '\n\n'
         except:
