@@ -1,3 +1,5 @@
+import traceback
+
 import requests
 import telebot
 import os
@@ -220,9 +222,13 @@ def format_last_records(response_dict):
     last_records = ''
 
     for record in response_dict:
-        last_records += record.get('report_date')
-        last_records += ' ' + record.get('author_name') + ': \n'
-        last_records += record.get('text') + '\n\n'
+        try:
+            last_records += record.get('report_date')
+            last_records += ' ' + record.get('author_name') + ': \n'
+            last_records += record.get('text') + '\n\n'
+        except:
+            print(traceback.TracebackException)
+
 
     return last_records
 
