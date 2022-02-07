@@ -596,7 +596,7 @@ if __name__ == '__main__':
 
     scheduler = BackgroundScheduler(timezone='Europe/Moscow')
 
-    scheduler.add_job(lambda: get_last_records(smena=every_day, records=2), trigger='interval', days=1, start_date=start_date_every_day, name="last_records_for_every_day", id='last_records_for_every_day')
+    scheduler.add_job(lambda: get_last_records(smena=every_day, records=1), trigger='interval', days=1, start_date=start_date_every_day, name="last_records_for_every_day", id='last_records_for_every_day')
 
     scheduler.add_job(lambda: get_last_records(smena=smena_1, records=3), trigger='interval', days=4,
                       start_date=start_date_smena_1, name="last_records_for_smena_1", id='last_records_for_smena_1')
