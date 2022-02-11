@@ -224,10 +224,11 @@ def format_last_records(response_dict):
 
     for record in response_dict:
         try:
-            date = record.get('report_date')
-            last_records += str((datetime.strptime(date, "%Y-%m-%d")).strftime("%d.%m.%Y"))
-            last_records += ' ' + record.get('author_name') + ': \n'
-            last_records += record.get('text') + '\n\n'
+            if record.get("text"):
+                date = record.get('report_date')
+                last_records += str((datetime.strptime(date, "%Y-%m-%d")).strftime("%d.%m.%Y"))
+                last_records += ' ' + record.get('author_name') + ': \n'
+                last_records += record.get('text') + '\n\n'
         except:
             print(traceback.TracebackException)
 
