@@ -6,11 +6,12 @@ import os
 import time
 import json
 import ast
+import re
 import schedule
 from datetime import datetime
 from time import sleep
 from ntoken import TOKEN
-from config import dest_cameras, dest_schemes, dest_ZOOM, url, login, password
+from config import dest_cameras, dest_schemes, dest_ZOOM, url, login, password, vmix_ip_dict
 from DB import Files, Schemes, ZOOM
 from schedule import start_date_every_day, start_date_smena_1, start_date_smena_2, start_date_smena_3, start_date_smena_4
 from telebot import types
@@ -38,6 +39,10 @@ commands_for_buttons = {'otpuska': 'Отпуска', 'ip_adr': 'ip', 'asb3bank':
                         'cameras_list': 'Камеры', 'zoom_list': 'Zoom', 'journal': 'Журнал'}
 commands_string = ''.join('{}{}'.format(key, val) for key, val in commands_for_buttons.items())
 
+streaming_message_id = ""
+vmix_ip = ""
+stream_autorun = False
+stream_stop = False
 
 def create_keyboard(chatid):
     keyboard = types.InlineKeyboardMarkup(row_width=4)
@@ -201,6 +206,148 @@ def unsubscribe(callback_query):
                           text="Рассылка отменена", reply_markup=keyboard)
 
     save_values()
+
+
+@bot.message_handler(content_types=["text"])
+def manage_vmix(message):
+    global streaming_message_id
+    global vmix_number
+    global vmix_ip
+    global stream_autorun
+
+    if "vmix" in message.text:                  # Отлавливаем сообщение-команду "vmix"+"номер"(+"старт")
+        vmix_number = message.text[4]
+        vmix_ip = get_vmix_ip(vmix_number)
+
+        if not vmix_ip:
+            bot.send_message(message.chat.id, "Vmix "+vmix_number+" недоступен")
+
+        streaming_message_id = str(message.message_id + 1)                  # id сообщения с данными стрима
+
+        """if "stop" in message.text:
+
+            stop_stream(vmix_ip)
+            bot.send_message(message.chat.id, "Потоки на Vmix"+vmix_number+" остановлены")
+
+            return None"""
+
+        if "start" in message.text:
+            stream_autorun = True
+
+    if streaming_message_id:
+        if message.message_id == int(streaming_message_id):
+
+            stream_dict = create_stream_dict(message)
+
+            stream_count = len(stream_dict.keys())
+
+            if stream_count > 3:
+                stream_count = 3
+
+            request_urls_list = assemble_requests(vmix_ip, stream_dict, stream_autorun, stream_count)
+
+            print(request_urls_list)
+
+            if not check_active_streaming(vmix_ip):
+
+                if send_stream_requests(request_urls_list):
+
+                    bot.send_message(message.chat.id, "Ссылка и ключ были внесены для "+str(stream_count) +
+                                 " потоков на Vmix " + vmix_number)
+
+                if check_active_streaming(vmix_ip):
+                    bot.send_message(message.chat.id, "Потоки на Vmix"+vmix_number+" запущены")
+                reset_global_values()
+
+            """else:
+                bot.send_message(message.chat.id, "Активен стрим на Vmix "+vmix_number +
+                                 "!\n Параметры потоков не изменены.")"""
+            start_message(message)
+
+
+def get_vmix_ip(vmix_number):
+    try:
+        vmix_ip = vmix_ip_dict[int(vmix_number)]
+
+        return vmix_ip
+    except:
+
+        print("Нет у нас такого vmix")
+
+
+def create_stream_dict(message):
+    stream_dict = {}
+    for n in range(len(message.text.splitlines())):
+        if "/" in message.text.splitlines()[n]:
+            try:
+                stream_dict[message.text.splitlines()[n]] = message.text.splitlines()[n + 1]
+            except:
+                print("Нет строки с ключом")
+
+    return stream_dict
+
+
+def assemble_requests(vmix_ip, stream_dict, stream_autorun, stream_count):
+    requests_list = []
+
+    for stream in range(stream_count):        # Create requests for stream urls & keys
+        request_set_url = "http://" + vmix_ip + ":8088/api/?Function=StreamingSetURL&Value=" + str(stream) + "," + \
+                  list(stream_dict.keys())[stream]
+        requests_list.append(request_set_url)
+        request_set_stream_key = "http://" + vmix_ip + ":8088/api/?Function=StreamingSetKey&Value=" + str(stream) + \
+                                 "," + stream_dict[list(stream_dict.keys())[stream]]
+        requests_list.append(request_set_stream_key)
+
+        if stream_autorun:
+
+            request_start_stream = "http://" + vmix_ip + ":8088/api/?Function=StartStreaming&Value=" + str(stream)
+
+            requests_list.append(request_start_stream)
+
+    return requests_list
+
+
+def send_stream_requests(request_urls_list):
+
+    for request_url in request_urls_list:
+
+        request = requests.get(request_url)
+
+        if request.status_code == "500":
+            print("500")
+            return False
+
+    return True
+
+
+def check_active_streaming(vmix_ip):
+
+    url = "http://"+vmix_ip+":8088/api/"
+    request = requests.get(url)
+    active_streaming = request.text.find("<streaming>True</streaming>").bit_length()
+    if active_streaming == 11:
+        return True
+    else:
+        return False
+
+
+def stop_stream(vmix_ip):
+
+    request_urls_list = ["http://" + vmix_ip + ":8088/api/?Function=StopStreaming"]
+
+    send_stream_requests(request_urls_list)
+
+
+def reset_global_values():
+    global stream_autorun
+    global streaming_message_id
+    global vmix_number
+    global vmix_ip
+
+    stream_autorun = False
+    streaming_message_id = ""
+    vmix_number = ""
+    vmix_ip = ""
 
 
 def get_last_records(smena, records):
