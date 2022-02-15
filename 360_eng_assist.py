@@ -280,9 +280,17 @@ def create_stream_dict(message):
     for n in range(len(message.text.splitlines())):
         if "/" in message.text.splitlines()[n]:
             try:
-                stream_dict[message.text.splitlines()[n]] = message.text.splitlines()[n + 1]
+                if len(message.text.splitlines()[n + 1]) > 5:
+                    stream_dict[message.text.splitlines()[n]] = message.text.splitlines()[n + 1]
+                else:
+                    stream_dict[message.text.splitlines()[n]] = message.text.splitlines()[n + 2]
             except:
                 print("Нет строки с ключом")
+        elif "ют" in message.text.splitlines()[n].lower():
+            if len(message.text.splitlines()[n + 1]) > 5:
+                stream_dict["rtmp://a.rtmp.youtube.com/live2"] = message.text.splitlines()[n + 1]
+            else:
+                stream_dict["rtmp://a.rtmp.youtube.com/live2"] = message.text.splitlines()[n + 2]
 
     return stream_dict
 
