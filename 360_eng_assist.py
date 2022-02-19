@@ -374,8 +374,8 @@ def get_last_records(smena, records):
                     bot.send_message(user_chat_id, last_records)
                 else:
                     bot.send_message(user_chat_id, 'no response')
-            except:
-                pass
+            except Exception as ex:
+                print(ex)
 
 def format_last_records(response_dict):
     last_records = ''
@@ -387,8 +387,8 @@ def format_last_records(response_dict):
                 last_records += str((datetime.strptime(date, "%Y-%m-%d")).strftime("%d.%m.%Y"))
                 last_records += ' ' + record.get('author_name') + ': \n'
                 last_records += record.get('text') + '\n\n'
-        except:
-            print(traceback.TracebackException)
+        except Exception as ex:
+            print(ex)
 
 
     return last_records
