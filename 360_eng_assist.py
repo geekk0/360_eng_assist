@@ -363,34 +363,34 @@ def get_last_records(smena, records):
 
         if user_chat_id:
 
-            raw_response = requests.get(url=url, auth=(login, password), params={'days': records})
+            raw_response = requests.get(url=url, auth=(login, password), params={'days': records}, timeout=40)
 
-            try:
-                response_dict = json.loads(raw_response.text)
+            response_dict = json.loads(raw_response.text)
 
-                last_records = format_last_records(response_dict)
+            last_records = format_last_records(response_dict)
 
-                if last_records:
-                    bot.send_message(user_chat_id, last_records)
-                else:
-                    bot.send_message(user_chat_id, 'no response')
-            except Exception as ex:
-                print(ex)
+            if last_records:
+                bot.send_message(user_chat_id, last_records)
+            else:
+                bot.send_message(user_chat_id, 'no response')
+                time.sleep(20)
+                get_last_records(smena, records)
+
+
 
 def format_last_records(response_dict):
     last_records = ''
 
     for record in response_dict:
-        try:
-            if record.get("text"):
+            if len(record.get("text")) > 1 and len(response_dict) > 1:
                 date = record.get('report_date')
                 last_records += str((datetime.strptime(date, "%Y-%m-%d")).strftime("%d.%m.%Y"))
                 last_records += ' ' + record.get('author_name') + ': \n'
                 last_records += record.get('text') + '\n\n'
-        except Exception as ex:
-            print(ex)
-
-
+            else:
+                # print("Нет текста отчета: " + record.text + record.report_date)
+                last_records = False
+                break
     return last_records
 
 
