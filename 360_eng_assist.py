@@ -377,20 +377,19 @@ def get_last_records(smena, records):
                 get_last_records(smena, records)
 
 
-
 def format_last_records(response_dict):
     last_records = ''
 
     for record in response_dict:
-            if len(record.get("text")) > 1 and len(response_dict) > 1:
-                date = record.get('report_date')
-                last_records += str((datetime.strptime(date, "%Y-%m-%d")).strftime("%d.%m.%Y"))
-                last_records += ' ' + record.get('author_name') + ': \n'
-                last_records += record.get('text') + '\n\n'
-            else:
-                # print("Нет текста отчета: " + record.text + record.report_date)
-                last_records = False
-                break
+        if isinstance(record.get("text"), str) and len(response_dict) > 1 and isinstance(record.get('author_name'), str):
+            date = record.get('report_date')
+            last_records += str((datetime.strptime(date, "%Y-%m-%d")).strftime("%d.%m.%Y"))
+            last_records += ' ' + record.get('author_name') + ': \n'
+            last_records += record.get('text') + '\n\n'
+        else:
+            # print("Нет текста отчета: " + record.text + record.report_date)
+            last_records = False
+            break
     return last_records
 
 
