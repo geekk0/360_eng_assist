@@ -363,18 +363,18 @@ def get_last_records(smena, records):
 
         if user_chat_id:
 
-            raw_response = requests.get(url=url, auth=(login, password), params={'days': records}, timeout=40)
-
             try:
+                raw_response = requests.get(url=url, auth=(login, password), params={'days': records}, timeout=40)
+
                 response_dict = json.loads(raw_response.text)
 
                 last_records = format_last_records(response_dict)
 
                 bot.send_message(user_chat_id, last_records)
+
             except:
-                bot.send_message(user_chat_id, 'no response')
-                time.sleep(20)
-                get_last_records(smena, records)
+
+                print("JSON load error")
 
 
 def format_last_records(response_dict):
