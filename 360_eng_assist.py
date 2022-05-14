@@ -365,13 +365,13 @@ def get_last_records(smena, records):
 
             raw_response = requests.get(url=url, auth=(login, password), params={'days': records}, timeout=40)
 
-            response_dict = json.loads(raw_response.text)
+            try:
+                response_dict = json.loads(raw_response.text)
 
-            last_records = format_last_records(response_dict)
+                last_records = format_last_records(response_dict)
 
-            if last_records:
                 bot.send_message(user_chat_id, last_records)
-            else:
+            except:
                 bot.send_message(user_chat_id, 'no response')
                 time.sleep(20)
                 get_last_records(smena, records)
