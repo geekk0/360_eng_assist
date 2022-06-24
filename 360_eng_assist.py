@@ -380,14 +380,19 @@ def get_last_records(smena, records):
 def format_last_records(response_dict):
     last_records = ''
 
+    print(str(response_dict))
+
     for record in response_dict:
-        if isinstance(record.get("text"), str) and len(response_dict) > 1 and isinstance(record.get('author_name'), str):
+        if isinstance(record.get("text"), str) and len(response_dict) > 1:
             date = record.get('report_date')
             last_records += str((datetime.strptime(date, "%Y-%m-%d")).strftime("%d.%m.%Y"))
-            last_records += ' ' + record.get('author_name') + ': \n'
+            if record.get('author_name'):
+                last_records += ' ' + record.get('author_name') + ': \n'
+            else:
+                last_records += ' Инженеры: \n'
             last_records += record.get('text') + '\n\n'
         else:
-            # print("Нет текста отчета: " + record.text + record.report_date)
+            print("Нет текста отчета: " + record.text + record.report_date)
             last_records = False
             break
     return last_records
